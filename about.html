@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About the Tool - Visualizer Suite</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>🎵 Pro Audio Visualizer Suite</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html" class="active">About the Tool</a>
+            <a href="features.html">Features & Gallery</a>
+            <a href="team.html">Meet the Team</a>
+            <a href="app.html">Live Web App</a>
+            <a href="https://github.com/JosueIRuiz/Python-Music-Visualizer-" target="_blank">GitHub Repo</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="card">
+            <h2 class="accent-text">How It Works Under the Hood</h2>
+            <p>The original Pro Audio Visualizer is a Python-based software suite built using powerful audio processing libraries like <strong>PyAudio</strong>, <strong>Librosa</strong>, and <strong>NumPy</strong>, with graphics rendered in <strong>Pygame</strong>.</p>
+            
+            <h3>The Audio Math</h3>
+            
+            <div class="placeholder-img">
+                <img src="images/FFT-Time-Frequency-View-540.webp">
+            </div>
+
+            <ul>
+                <li><strong>Noise Gating (RMS):</strong> The tool calculates the Root Mean Square (RMS) of the audio chunks to filter out background static when using a live microphone.</li>
+                <li><strong>Frequency Analysis (FFT):</strong> Using Fast Fourier Transform, raw audio waveforms are broken down into individual frequency bands, which dictate the height and length of the visualizer bars.</li>
+                <li><strong>Pitch Detection:</strong> For tools with Note Detection, the code uses mathematical Autocorrelation to find the fundamental pitch, mapping it to standard MIDI notes (like C# or G4).</li>
+            </ul>
+
+            <h3>Video Auto-Export</h3>
+            
+            <div class="placeholder-img">
+				<img src="images/MV_Muxing_Diagram.jpg" height="">
+            </div>
+
+            <p>When processing static audio files (.mp3, .wav), the suite captures individual frames using OpenCV and routes them through a bundled <strong>FFmpeg</strong> script. This muxes the raw frames and the audio track together into a high-quality, ready-to-share .mp4 file.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Pro Audio Visualizer Team. All rights reserved.</p>
+    </footer>
+</body>
+</html>

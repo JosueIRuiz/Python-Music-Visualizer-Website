@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live App - Visualizer Suite</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Ensures the canvas stays neatly inside our boxy container */
+        .app-container {
+            position: relative;
+            overflow: hidden; 
+        }
+        #canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        /* The text that shows before they click */
+        #start-text {
+            position: absolute;
+            z-index: 10;
+            pointer-events: none; /* Lets the click pass through to the container */
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎵 Pro Audio Visualizer Suite</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About the Tool</a>
+            <a href="features.html">Features & Gallery</a>
+            <a href="team.html">Meet the Team</a>
+            <a href="app.html" class="active">Live Web App</a>
+            <a href="https://github.com/JosueIRuiz/Python-Music-Visualizer-" target="_blank">GitHub Repo</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2 class="accent-text" style="text-align: center;">Interactive Web Demo</h2>
+        <p style="text-align: center; color: #b3b3b3;">Click the box below to allow microphone access and expand the visualizer to full screen.</p>
+
+        <div class="app-wrapper">
+            <div id="visualizer-app" class="app-container" onclick="initApp()">
+                <div id="start-text">
+                    <h3>[ Launch Web Visualizer ]</h3>
+                    <p>Click to start microphone</p>
+                </div>
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const container = document.getElementById("visualizer-app");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const startText = document.getElementById("start-text");
+
+        let audioContext;
+        let analyser;
+        let dataArray;
+        let isInitialized = false;
+
+        // Custom resize function to match the container's box size
+        function resizeCanvas() {
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+
+        // Your partner's Math/Color logic
+        function hsvToRgb(h, s, v) {
+            let c = v * s;
+            let x = c * (1 - Math.abs((h * 6) % 2 - 1));
+            let m = v - c;
+
+            let r, g, b;
+            if (h < 1/6) [r,g,b] = [c,x,0];
+            else if (h < 2/6) [r,g,b] = [x,c,0];
+            else if (h < 3/6) [r,g,b] = [0,c,x];
+            else if (h < 4/6) [r,g,b] = [0,x,c];
+            else if (h < 5/6) [r,g,b] = [x,0,c];
+            else [r,g,b] = [c,0,x];
+
+            return [
+                Math.floor((r + m) * 255),
+                Math.floor((g + m) * 255),
+                Math.floor((b + m) * 255)
+            ];
+        }
+
+        function binToFreq(bin) {
+            return bin * audioContext.sampleRate / analyser.fftSize;
+        }
+
+        function setupAudio(stream) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioContext.createMediaStreamSource(stream);
+
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+
+            source.connect(analyser);
+
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+            draw();
+        }
+
+        // Your partner's Drawing logic
+        function draw() {
+            requestAnimationFrame(draw);
+
+            // Dynamically get the center based on current canvas size
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const baseRadius = Math.min(canvas.width, canvas.height) * 0.15; // Scales radius with screen
+            const bars = 180;
+
+            analyser.getByteFrequencyData(dataArray);
+
+            // fade for trails
+            ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            let peaks = [];
+
+            for (let i = 0; i < bars; i++) {
+                let value = dataArray[i] / 255;
+                let angle = (Math.PI * 2 / bars) * i;
+
+                let length = value * (Math.min(canvas.width, canvas.height) * 0.3); // Scales lines with screen
+
+                let hue = i / bars;
+
+                let brightness = Math.min(1, value * 3);
+                let [r, g, b] = hsvToRgb(hue, 1, brightness);
+
+                ctx.strokeStyle = `rgb(${r},${g},${b})`;
+                ctx.lineWidth = 2 + value * 5;
+
+                let x1 = centerX + Math.cos(angle) * baseRadius;
+                let y1 = centerY + Math.sin(angle) * baseRadius;
+
+                let x2 = centerX + Math.cos(angle) * (baseRadius + length);
+                let y2 = centerY + Math.sin(angle) * (baseRadius + length);
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+
+                // collect peaks
+                if (dataArray[i] > 180) {
+                    peaks.push({ bin: i, value: dataArray[i] });
+                }
+            }
+
+            ctx.shadowBlur = 0;
+
+            // sort peaks
+            peaks.sort((a, b) => b.value - a.value);
+            let topPeaks = peaks.slice(0, 8);
+
+            // display peak frequencies
+            ctx.fillStyle = "white";
+            ctx.font = "16px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+
+            for (let i = 0; i < topPeaks.length; i++) {
+                let freq = binToFreq(topPeaks[i].bin).toFixed(0);
+                ctx.fillText(`${freq} Hz`, 20, 40 + i * 25);
+            }
+        }
+
+        // --- Interaction Logic ---
+        function initApp() {
+            // Toggle Fullscreen CSS
+            container.classList.toggle("fullscreen");
+            
+            // Recalculate canvas size slightly after CSS transition
+            setTimeout(resizeCanvas, 300);
+
+            // Only request microphone on the very first click
+            if (!isInitialized) {
+                isInitialized = true;
+                startText.style.display = "none"; // Hide the click instruction text
+                resizeCanvas();
+
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(setupAudio)
+                    .catch(err => {
+                        alert("Microphone access denied: " + err);
+                    });
+            }
+        }
+
+        // Adjust canvas if the user resizes their browser window
+        window.addEventListener("resize", resizeCanvas);
+    </script>
+
+    <footer>
+        <p>&copy; 2026 Pro Audio Visualizer Team. All rights reserved.</p>
+    </footer>
+</body>
+</html>

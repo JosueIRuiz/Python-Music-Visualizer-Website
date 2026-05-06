@@ -1,0 +1,150 @@
+/* style.css */
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* --- STICKY HEADER --- */
+header {
+    background-color: #181818;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #1DB954;
+    position: sticky; /* Locks it to the top */
+    top: 0;
+    z-index: 1000; /* Ensures it stays above the content */
+}
+
+header h1 {
+    margin: 0;
+    color: #1DB954;
+}
+
+nav {
+    margin-top: 15px;
+}
+
+nav a {
+    color: #b3b3b3;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+nav a:hover, nav a.active {
+    color: #1DB954;
+}
+
+main {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Card Styling - NOW BOXY */
+.card {
+    background-color: #282828;
+    padding: 20px;
+    border-radius: 0; /* Removed rounded corners */
+    margin-bottom: 20px;
+}
+
+.accent-text {
+    color: #1DB954;
+}
+
+/* Button Styling - NOW BOXY */
+.btn {
+    display: inline-block;
+    background-color: #1DB954;
+    color: #121212;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 0; /* Removed rounded corners */
+    font-weight: bold;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #1ed760;
+}
+
+/* Grid for Features and Team pages */
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* --- Web App Page Specific Styles --- */
+.app-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
+}
+
+/* App Container - NOW BOXY */
+.app-container {
+    width: 600px;
+    height: 400px;
+    background-color: #000;
+    border: 3px solid #1DB954;
+    border-radius: 0; /* Removed rounded corners */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #b3b3b3;
+}
+
+.app-container:hover {
+    border-color: #1ed760;
+    box-shadow: 0 0 15px rgba(29, 185, 84, 0.5);
+}
+
+.app-container.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    z-index: 9999;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #b3b3b3;
+    font-size: 0.9em;
+    margin-top: 40px;
+}
+
+/* --- Image Placeholders --- */
+.placeholder-img {
+    background-color: #1f1f1f;
+    color: #b3b3b3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    margin: 15px 0;
+    border: 1px dashed #1DB954;
+    font-style: italic;
+    min-height: 200px; /* Default height */
+}
+
+/* Specific heights for different contexts */
+.placeholder-img.hero { min-height: 350px; }
+.placeholder-img.headshot { min-height: 150px; width: 150px; margin: 0 auto 15px auto; }
